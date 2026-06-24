@@ -41,3 +41,18 @@ Keeps business logic clean and reusable.
 
 - Learn express.Router()
 - Build first router
+## Day 2
+
+### Learned
+- express.Router() returns a router object.
+- Routes map URLs to controller functions.
+- Controllers contain business logic.
+- module.exports exports values from a file.
+- require() imports exported values.
+
+### Questions
+- How does app.use() connect routers?
+- How does Express internally store routes?
+
+### Next Goal
+- Build first authRouter and connect it with server.js.
