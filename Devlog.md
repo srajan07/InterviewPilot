@@ -162,4 +162,15 @@ Browser → Route → Controller → Model → Database → Model → Controller
 * Connect routes, controllers, and models.
 * Implement user registration.
 * Connect MongoDB.
+## Day 4
 
+### Learned
+- Created my  Mongoose schema.
+- Understood the difference between Schema and Model.
+- Learned why controllers call `User.create()`.
+- Understood `module.exports` and `require()`.
+- Fixed MongoDB connection issues by upgrading Node.js and starting the MongoDB service.
+
+### Next Goal
+- Build the Register API.
+- Learn password hashing with bcrypt.
