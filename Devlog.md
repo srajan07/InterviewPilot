@@ -174,3 +174,41 @@ Browser → Route → Controller → Model → Database → Model → Controller
 ### Next Goal
 - Build the Register API.
 - Learn password hashing with bcrypt.
+
+- # Day 5 - User Model & Registration Flow
+
+## ✅ Completed
+
+- Created the User Mongoose Schema.
+- Learned the difference between Schema and Model.
+- Added validation for:
+  - fullName
+  - email
+  - password
+  - role
+- Configured timestamps in Mongoose.
+- Understood why controllers use the User model.
+- Learned `module.exports` and `require`.
+- Designed the complete registration workflow.
+- Understood why duplicate emails should not be allowed.
+- Learned `User.findOne()` vs `User.create()`.
+- Learned password hashing using `bcrypt.hash()`.
+- Learned password verification using `bcrypt.compare()`.
+- Understood why passwords are never stored in plain text.
+
+## 🧠 Key Concepts Learned
+
+- Route → Controller → Model → MongoDB
+- Request lifecycle
+- Object destructuring (`req.body`)
+- Validation before database operations
+- Truthy and falsy values (`null` vs object)
+- Why `return res.status()` stops controller execution
+- Difference between Authentication and Authorization
+- Why JWT is generated only after successful login
+
+## 🎯 Next Goal
+
+- Build the Register Controller
+- Save users into MongoDB
+- Test registration using Postman
