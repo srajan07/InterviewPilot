@@ -1,3 +1,4 @@
+const { JsonWebTokenError } = require("jsonwebtoken");
 const User= require("../models/User");
 const bcrypt=require("bcrypt");
 
@@ -24,15 +25,45 @@ async function registerUser(req,res){
 }
 catch(error){
     res.status(500).json("Error");
-    console.log(error);
-}
-
     
 }
-function login(req,res){
-    res.send("Login Controller ");
+
+}
+        // Login
+async function loginUser(req,res){
+    const {email,password}=req.body;
+    if(!email || !password){
+        return res.status(400).json("All feilds are required");
+    }
+    try{
+        const existUser=await User.findOne({email});
+        if(!existUser) return res.status(401).json("Invalid email or password");
+        const Ismatch=await bcrypt.compare(password,existUser.password);
+        if(!Ismatch) return res.status(401).json("Invalid email or password");
+       const Token =  await jwt.sign({
+             id:existUser.id,
+             role:existUser.role,
+        
+        }, process.env.JWT_TOKEN,
+    {
+         expiresIn:"7d"
+    })
+  return res.status(200).json({
+    message:"Successfully Login",
+    token:Token
+    });
+
+    }
+    catch(error){
+        
+        return res.status(500).json({
+            message: error.message
+    });
+        
+    }
+
 }
 module.exports={
     registerUser,
-    login,
+    loginUser,
 };
