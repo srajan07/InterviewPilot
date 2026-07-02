@@ -212,3 +212,28 @@ Browser → Route → Controller → Model → Database → Model → Controller
 - Build the Register Controller
 - Save users into MongoDB
 - Test registration using Postman
+# Day 7 - Login API
+
+## ✅ Completed
+- Implemented Login Controller
+- Validated login input
+- Found user using User.findOne()
+- Compared passwords using bcrypt.compare()
+- Generated JWT using jwt.sign()
+- Returned authentication token
+- Improved authentication error handling
+- Learned secure JWT payload design
+
+## 🧠 Key Concepts Learned
+- Authentication flow
+- JWT payload
+- bcrypt.compare()
+- 401 Unauthorized
+- Why HTTP-only cookies are more secure than localStorage for JWTs
+- Why APIs should not reveal whether the email or password was incorrect
+
+## 🎯 Next Goal
+- Build JWT Authentication Middleware
+- Verify tokens
+- Protect private routes
+- Understand req.user
