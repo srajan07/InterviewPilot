@@ -40,8 +40,8 @@ async function loginUser(req,res){
         if(!existUser) return res.status(401).json("Invalid email or password");
         const Ismatch=await bcrypt.compare(password,existUser.password);
         if(!Ismatch) return res.status(401).json("Invalid email or password");
-       const Token =  await jwt.sign({
-             id:existUser.id,
+       const token =  jwt.sign({
+             id:existUser._id,
              role:existUser.role,
         
         }, process.env.JWT_TOKEN,
@@ -50,14 +50,14 @@ async function loginUser(req,res){
     })
   return res.status(200).json({
     message:"Successfully Login",
-    token:Token
+    token:token,
     });
 
     }
     catch(error){
         
         return res.status(500).json({
-            message: error.message
+            message:"Server internal error"
     });
         
     }
