@@ -237,3 +237,26 @@ Browser → Route → Controller → Model → Database → Model → Controller
 - Verify tokens
 - Protect private routes
 - Understand req.user
+# Day 8 - JWT Authentication Middleware
+
+## ✅ Completed
+- Created authMiddleware
+- Read JWT from Authorization header
+- Extracted Bearer token
+- Verified JWT using jwt.verify()
+- Stored decoded payload in req.user
+- Used next() to continue request
+- Protected routes using middleware
+
+## 🧠 Learned
+- req.headers.authorization
+- Bearer Token format
+- jwt.verify()
+- req.user
+- next()
+- Difference between middleware and controllers
+
+## 🎯 Next Goal
+- Build Get Profile API
+- Use req.user.id
+- Fetch logged-in user using User.findById()
