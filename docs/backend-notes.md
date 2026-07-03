@@ -234,3 +234,48 @@ Controller
 * Routes use controllers.
 * Server uses routers.
 * Middleware prepares the request before controllers execute.
+Browser
+
+↓
+
+GET /profile
+
+↓
+
+Authorization: Bearer <JWT>
+
+↓
+
+Auth Middleware
+
+↓
+
+Extract Token
+
+↓
+
+jwt.verify()
+
+↓
+
+req.user = decoded
+
+↓
+
+next()
+
+↓
+
+Controller
+
+↓
+
+User.findById(req.user.id)
+
+↓
+
+MongoDB
+
+↓
+
+Browser
