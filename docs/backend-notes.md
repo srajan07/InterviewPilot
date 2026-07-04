@@ -279,3 +279,30 @@ MongoDB
 ↓
 
 Browser
+# JWT Authentication Flow
+
+Browser
+    │
+    ▼
+Authorization: Bearer <JWT>
+    │
+    ▼
+authMiddleware
+    │
+    ├── Check Authorization header
+    ├── Extract token
+    ├── Verify JWT
+    ├── req.user = decoded
+    └── next()
+    │
+    ▼
+Controller
+    │
+    ▼
+User.findById(req.user.id)
+    │
+    ▼
+MongoDB
+    │
+    ▼
+Browser
