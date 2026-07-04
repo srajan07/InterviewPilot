@@ -1,4 +1,4 @@
-const { JsonWebTokenError } = require("jsonwebtoken");
+const jwt=require("jsonwebtoken");
 const User= require("../models/User");
 const bcrypt=require("bcrypt");
 
@@ -24,8 +24,11 @@ async function registerUser(req,res){
     res.status(201).json("User registered successfully");
 }
 catch(error){
-    res.status(500).json("Error");
-    
+    console.error(error);
+
+    return res.status(500).json({
+        message: "Internal Server Error"
+    });
 }
 
 }
@@ -63,7 +66,21 @@ async function loginUser(req,res){
     }
 
 }
+async function getProfile(req,res){
+    const user= await User.findById(req.user.id);
+    if(!user){
+        return res.status(404).json({
+            message:"User not found"
+        })
+    }
+   return res.json({
+        fullName: user.fullName,
+    email: user.email,
+    role: user.role
+    });
+}
 module.exports={
     registerUser,
     loginUser,
+    getProfile,
 };

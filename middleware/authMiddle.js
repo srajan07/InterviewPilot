@@ -10,7 +10,7 @@ function authMiddleware(req,res,next){
    }
  catch (error) {
      return res.status(401).json({
-            message:"Token is expired or missing"
+            message:"Invalid or expired token"
         })
    }
 
