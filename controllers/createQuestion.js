@@ -19,6 +19,7 @@ async function createQuestion(req,res){
       description,
       difficulty,
       category,
+      createdBy:req.User.id
    });
    return res.status(201).json({
     message:"Question created successfully",
