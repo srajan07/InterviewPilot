@@ -260,3 +260,34 @@ Browser → Route → Controller → Model → Database → Model → Controller
 - Build Get Profile API
 - Use req.user.id
 - Fetch logged-in user using User.findById()
+# Day 14-16 - Advanced MongoDB & Express
+
+## ✅ Completed
+
+- Added Question validation middleware
+- Validated difficulty and category
+- Learned middleware chaining
+- Added createdBy relationship using ObjectId
+- Learned One-to-Many relationships
+- Learned ref and populate()
+- Implemented query parameter filtering
+- Built dynamic MongoDB filters using req.query
+
+## 🧠 Key Concepts Learned
+
+- ObjectId
+- ref
+- populate()
+- req.query
+- Dynamic filters
+- MongoDB search
+- Database relationships
+- One-to-Many mapping
+
+## 🎯 Next Goal
+
+- Pagination
+- Sorting
+- Search by keyword
+- Advanced MongoDB queries
+- 
