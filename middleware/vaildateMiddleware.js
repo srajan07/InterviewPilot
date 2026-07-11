@@ -20,3 +20,4 @@ if (!validDifficulties.includes(difficulty)) {
     }
     next();
 }
+module.exports = validateQuestion;

@@ -1,6 +1,6 @@
 const Question = require("../models/questionSchema");
 
-async function createQuestion(req,res){
+async function createQuestion(req,res,next){
     const {title,description,difficulty,category}=req.body;
     if(!title || !description || !difficulty || !category){
         return res.status(400).json({
@@ -9,6 +9,7 @@ async function createQuestion(req,res){
     }
     try{
    const existQues=await Question.findOne({title});
+
    if(existQues){
     return res.status(400).json({
         message:"Question already exist"
@@ -19,7 +20,7 @@ async function createQuestion(req,res){
       description,
       difficulty,
       category,
-      createdBy:req.User.id
+      createdBy:req.user.id
    });
    return res.status(201).json({
     message:"Question created successfully",
@@ -27,18 +28,43 @@ async function createQuestion(req,res){
    });
 }
 catch(error){
-    return res.status(500).json({
-     messaage:"Internal server error"
-    })
+ next(error);
 }
 }
 async function readQuestion(req,res){
-  const questions= await Question.find();
+   const{difficulty,category,search,sort}=req.query;
+   const page = Number(req.query.page)||1;
+   const limit =Number(req.query.limit)||10;
 
-  if (questions.length === 0){
-    return res.status(404).json("Question not founded");
-  }
- return res.status(200).json(questions);
+   const skip=(page-1)*limit;
+   const filter={};
+   if(difficulty)filter.difficulty=difficulty;
+   if(category)filter.category=category;
+
+   if(search){
+    filter.title={
+        $regex:search,
+        $options:"i",
+    }
+   }
+   let sortOption={createdAt:-1};
+   if(sort === "newest") sortOption = {createdAt : -1};
+   else if(sort === "oldest") sortOption= {createdAt : 1};
+
+  const questions= await Question.find(filter).sort(sortOption).skip(skip).limit(limit);
+
+  const totalQuestions= await Question.countDocuments(filter);
+  const totalPages= Math.ceil(totalQuestions/limit);
+  const hasNextPage=page<totalPages;
+  const hasPreviousPage=page>1;
+ return res.status(200).json({
+    questions,
+    currentPage:page,
+    totalPages,
+    totalQuestions,
+    hasNextPage,
+    hasPreviousPage,
+ });
 }
 //update the question
 async function updateQues(req,res){
