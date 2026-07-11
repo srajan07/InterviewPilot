@@ -290,4 +290,43 @@ Browser → Route → Controller → Model → Database → Model → Controller
 - Sorting
 - Search by keyword
 - Advanced MongoDB queries
-- 
+- # Day 13-16 - Backend Improvements
+
+## ✅ Completed
+
+- Built complete Question CRUD APIs
+- Added Question validation middleware
+- Learned middleware chaining
+- Added createdBy relationship using ObjectId
+- Learned One-to-Many relationships
+- Understood ref and populate()
+
+## 🧠 Key Concepts Learned
+
+- CRUD operations
+- Validation middleware
+- ObjectId
+- ref
+- populate()
+- One-to-Many relationships
+- Middleware flow
+- JWT authentication
+- Authorization
+
+## 📚 Learned (Not Implemented Yet)
+
+- Query filtering using req.query
+- Pagination (skip & limit)
+- Sorting using sort()
+- Search using regex
+- API response metadata
+- Global error handling middleware
+
+## 🎯 Next Goal
+
+- Implement filtering
+- Implement pagination
+- Implement sorting
+- Implement search
+- Add response metadata
+- Add global error middleware
