@@ -1,15 +1,9 @@
 const Question = require("../models/questionSchema");
-
-async function createQuestion(req,res,next){
-    const {title,description,difficulty,category}=req.body;
-    if(!title || !description || !difficulty || !category){
-        return res.status(400).json({
-            message:"All feilds are required"
-        })
-    }
-    try{
-   const existQues=await Question.findOne({title});
-
+const asyncHandler=require("../utils/asyncHandler");
+const {AppError}=require("../utils/AppError");
+const  createQuestion = asyncHandler(async(req,res)=>{
+const {title,description,difficulty,category}=req.body;
+const existQues=await Question.findOne({title});
    if(existQues){
     return res.status(400).json({
         message:"Question already exist"
@@ -26,12 +20,8 @@ async function createQuestion(req,res,next){
     message:"Question created successfully",
     question,
    });
-}
-catch(error){
- next(error);
-}
-}
-async function readQuestion(req,res){
+});
+const readQuestion = asyncHandler(async(req,res)=>{
    const{difficulty,category,search,sort}=req.query;
    const page = Number(req.query.page)||1;
    const limit =Number(req.query.limit)||10;
@@ -65,24 +55,22 @@ async function readQuestion(req,res){
     hasNextPage,
     hasPreviousPage,
  });
-}
+});
 //update the question
-async function updateQues(req,res){
+const updateQues=asyncHandler(async(req,res)=>{
     const {id} =req.params ;
     const data = req.body;
     const updateq = await Question.findByIdAndUpdate(id,data,{new :true}); 
     if(!updateq){
-        return res.status(404).json({
-            message:"Question not founded"
-        })
+        throw new AppError("Question not found", 404);
     }
     return res.status(200).json({
         message:"Question updated Succesfully",
         question:updateq
 
     });
-}
-async function deleteQues(req,res){
+});
+const deleteQues=asyncHandler(async(req,res)=>{
     const {id}=req.params;
     const deleteq=await Question.findByIdAndDelete(id);
     if(!deleteq){
@@ -94,7 +82,7 @@ async function deleteQues(req,res){
             message:"delete question successfully",
 
         })
-}
+});
 module.exports={
     createQuestion,
     readQuestion,
