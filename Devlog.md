@@ -324,9 +324,20 @@ Browser → Route → Controller → Model → Database → Model → Controller
 
 ## 🎯 Next Goal
 
+
 - Implement filtering
 - Implement pagination
 - Implement sorting
 - Implement search
 - Add response metadata
 - Add global error middleware
+ #DAY
+### Learned
+- Created reusable ApiResponse class.
+- Replaced manual success responses with standardized responses.
+- Integrated AppError with controllers.
+- Improved controller architecture using asyncHandler.
+
+### Key Takeaway
+Keeping API responses consistent makes the backend easier to maintain and easier for frontend developers to consume.
+
