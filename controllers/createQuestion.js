@@ -1,13 +1,12 @@
 const Question = require("../models/questionSchema");
 const asyncHandler=require("../utils/asyncHandler");
-const {AppError}=require("../utils/AppError");
+const AppError=require("../utils/AppError");
+const ApiResponse=require("../utils/ApiResponse");
 const  createQuestion = asyncHandler(async(req,res)=>{
 const {title,description,difficulty,category}=req.body;
 const existQues=await Question.findOne({title});
    if(existQues){
-    return res.status(400).json({
-        message:"Question already exist"
-    })
+    throw new AppError("Question already exist",404);
    }
   const question= await Question.create({
       title,
@@ -16,10 +15,13 @@ const existQues=await Question.findOne({title});
       category,
       createdBy:req.user.id
    });
-   return res.status(201).json({
-    message:"Question created successfully",
-    question,
-   });
+   return res.status(201).json(
+    new ApiResponse(
+        201,
+        question,
+        "Question Created Succesfully",
+    )
+   );
 });
 const readQuestion = asyncHandler(async(req,res)=>{
    const{difficulty,category,search,sort}=req.query;
@@ -47,14 +49,20 @@ const readQuestion = asyncHandler(async(req,res)=>{
   const totalPages= Math.ceil(totalQuestions/limit);
   const hasNextPage=page<totalPages;
   const hasPreviousPage=page>1;
- return res.status(200).json({
+ return res.status(200).json(
+    new ApiResponse(
+    200,
+    {
     questions,
     currentPage:page,
     totalPages,
     totalQuestions,
     hasNextPage,
     hasPreviousPage,
- });
+ },
+ "Questions Fetched SuccessFully"
+)
+);
 });
 //update the question
 const updateQues=asyncHandler(async(req,res)=>{
@@ -64,25 +72,28 @@ const updateQues=asyncHandler(async(req,res)=>{
     if(!updateq){
         throw new AppError("Question not found", 404);
     }
-    return res.status(200).json({
-        message:"Question updated Succesfully",
-        question:updateq
-
-    });
+    return res.status(200).json(
+        new ApiResponse(
+            200,
+            updateq,
+            "Question updated Succesfully"
+        )
+    )
 });
 const deleteQues=asyncHandler(async(req,res)=>{
     const {id}=req.params;
     const deleteq=await Question.findByIdAndDelete(id);
-    if(!deleteq){
-        return res.status(404).json({
-        message:"Internal sever error",
-    })
-    }
-    return res.status(200).json({
-            message:"delete question successfully",
+    if(!deleteq)throw new AppError("Question not found",404);
 
-        })
+    return res.status(200).json(
+        new ApiResponse(
+            200,
+            null,
+            "delete question successfully",
+        )
+    );
 });
+
 module.exports={
     createQuestion,
     readQuestion,

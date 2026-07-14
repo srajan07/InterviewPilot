@@ -7,6 +7,11 @@ const { createQuestion, readQuestion,updateQues,deleteQues } = require("../contr
 const router=express.Router();
 router.post("/login",loginUser);
 router.post("/questions",authMiddleware,adminMiddleware,questionValidation,createQuestion);
+// router.post(
+//     "/profile",
+//     upload.single("image"),
+//     updateProfile
+// );
 router.get("/questions/:id",authMiddleware,readQuestion);
 router.put("/questions/:id",authMiddleware,adminMiddleware,questionValidation,updateQues);
 router.delete("/questions/:id",authMiddleware,adminMiddleware,deleteQues);
