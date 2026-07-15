@@ -12,6 +12,12 @@ router.post("/questions",authMiddleware,adminMiddleware,questionValidation,creat
 //     upload.single("image"),
 //     updateProfile
 // );
+// router.put(
+//     "/profile/image",
+//     authMiddleware,
+//     upload.single("profileImage"),
+//     updateProfileImage
+// );
 router.get("/questions/:id",authMiddleware,readQuestion);
 router.put("/questions/:id",authMiddleware,adminMiddleware,questionValidation,updateQues);
 router.delete("/questions/:id",authMiddleware,adminMiddleware,deleteQues);
