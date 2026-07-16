@@ -27,7 +27,13 @@ const userSchema=new mongoose.Schema({
 
     profileImagePublicId: {
     type: String
-  }  
+  }  ,
+  resetPasswordOtp:{
+      type:String,
+  },
+  resetPasswordOtpExpires:{
+       type:Date,
+  }
 
 },{
     timestamps:true,
