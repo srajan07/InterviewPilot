@@ -29,7 +29,7 @@ const userSchema=new mongoose.Schema({
     type: String
   }  ,
   resetPasswordOtp:{
-      type:String,
+      type:String ,
   },
   resetPasswordOtpExpires:{
        type:Date,

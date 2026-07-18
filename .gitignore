@@ -10,7 +10,7 @@ node_modules/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-
+uploads/
 # Optional: If using package-lock.json, you might want to keep it, 
 # but if you want to ignore it too, uncomment below:
 # package-lock.json

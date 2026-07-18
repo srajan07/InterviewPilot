@@ -1,11 +1,12 @@
 require("dotenv").config();
 const express=require("express");
+const cookieParser = require("cookie-parser");
 const app=express();
 const authrout=require("./routes/authrout");
 const errorMiddleware=require("./middleware/errorMiddleware");
 const { connectDB } = require("./config/db");
 app.use(express.json());
-
+app.use(cookieParser());
 
 
 app.get("/",(req,res)=>{
