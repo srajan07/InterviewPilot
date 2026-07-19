@@ -115,7 +115,7 @@ const logout=asyncHandler(async(req,res)=>{
     res.clearCookie("refreshToken",cookieOptions);
     return res.status(200).json(new ApiResponse(200,null,"logout successfully"));
 });
-const forgetPassword=asyncHandler(async(req,res)=>{
+const forgotPassword=asyncHandler(async(req,res)=>{
    const{email}=req.body;
    if(!email) throw new AppError("Enter the email first",400);
 
@@ -196,7 +196,7 @@ module.exports={
     refreshAccessToken,
     logout,
     getProfile,
-    forgetPassword,
+    forgotPassword,
     verifyOtp,
     resetPassword,
 };
