@@ -33,10 +33,19 @@ const uploadResume=asyncHandler(async(req,res)=>{
   return res.status(200).json(new ApiResponse(200,resume,"Resume uploaded"));
 });
 const getResume = asyncHandler(async(req,res)=>{
-   
-});
-const deleteResume = asyncHandler(async(req,res)=>{
+   const resume= await Resume.findOne({ user: req.user.id });
+  if (!resume)throw new AppError("resume not found", 404);
 
+  return res.status(200).json(new ApiResponse(200, resume, "Resume fetched successfully"));
+});
+const deleteResume = asyncHandler(async (req, res) => {
+  const resume = await Resume.findOne({ user: req.user.id });
+  if (!resume) throw new AppError("resume not found", 404);
+
+  await cloudinary.uploader.destroy(resume.resume.publicId, { resource_type: "raw" });
+  await resume.deleteOne();
+
+  return res.status(200).json(new ApiResponse(200, null, "Resume deleted"));
 });
 module.exports={
     uploadResume,

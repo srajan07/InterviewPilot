@@ -9,6 +9,7 @@ const userRoutes = require("./routes/user.routes");
 const resumeRoutes=require("./routes/resumeRoutes");
 const questionRoutes=require("./routes/questionRoutes");
 const authroutes=require("./routes/authroutes");
+const interviewroutes=require("./routes/interviewRoutes");
 
 app.use(express.json());
 app.use(cookieParser());
@@ -17,6 +18,7 @@ app.use("/api/questions",questionRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/resume",resumeRoutes);
 app.use("/api/auth",authroutes);
+app.use("/api/interview",interviewroutes);
 
 app.get("/",(req,res)=>{
     res.send("Welcome to AI Interview Platform API");
@@ -33,3 +35,4 @@ async function startServer() {
     app.listen(PORT, () => {
     console.log("Server running");
 });}
+app.use("/api/auth",authroutes);
