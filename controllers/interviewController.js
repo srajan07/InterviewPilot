@@ -3,7 +3,7 @@ const asyncHandler = require("../utils/asyncHandler");
 const AppError = require("../utils/AppError");
 const ApiResponse = require("../utils/ApiResponse");
 const dummyQuestions = require("../utils/dummyQuestions");
-const { evaluateAnswer } = require("../services/aiService");
+const { evaluateAnswer,generateInterviewReport } = require("../services/aiService");
 
 const startInterview = asyncHandler(async (req, res) => {
   const { role, difficulty, language, totalQuestions, duration } = req.body;
@@ -77,21 +77,10 @@ const submitAnswer = asyncHandler(async (req, res) => {
   currentQuestion.isAnswered = true;
   currentQuestion.evaluationStatus = "pending";
 
-  const nextIndex = questionIndex + 1;
-  const completed = nextIndex >= interSession.questions.length;
-
-  if (completed) {
-    interSession.status = "completed";
-    interSession.completedAt = new Date();
-  } else {
-    interSession.currentQuestion = nextIndex;
-  }
-
-  // Save answer before AI
   await interSession.save();
 
   // -----------------------------
-  // AI Evaluation
+  // AI Evaluation (must happen BEFORE report generation)
   // -----------------------------
   try {
     const evaluation = await evaluateAnswer(
@@ -103,17 +92,38 @@ const submitAnswer = asyncHandler(async (req, res) => {
     currentQuestion.score = evaluation.score;
     currentQuestion.aiFeedback = evaluation.feedback;
     currentQuestion.evaluationStatus = "completed";
-
-    await interSession.save();
   } catch (error) {
     console.error("AI Evaluation Failed:", error.message);
-
+    currentQuestion.score = currentQuestion.score ?? 0;
     currentQuestion.evaluationStatus = "failed";
+    // Don't throw. User's answer is already stored.
+  }
+
+  await interSession.save();
+
+  const nextIndex = questionIndex + 1;
+  const completed = nextIndex >= interSession.questions.length;
+
+  if (completed) {
+    interSession.status = "completed";
+    interSession.completedAt = new Date();
+
+    const totalScore = interSession.questions.reduce(
+      (sum, question) => sum + (question.score || 0),
+      0
+    );
+    const overallScore = Math.round(totalScore / interSession.questions.length);
+
+    const report = await generateInterviewReport(interSession.questions);
+
+    interSession.report = {
+      overallScore,
+      strengths: report.strengths,
+      weaknesses: report.weaknesses,
+      recommendation: report.recommendation,
+    };
 
     await interSession.save();
-
-    // Don't throw error.
-    // User's answer is already stored.
   }
 
   const responsePayload = {
@@ -131,15 +141,40 @@ const submitAnswer = asyncHandler(async (req, res) => {
   }
 
   return res.status(200).json(
+    new ApiResponse(200, responsePayload, "Answer submitted successfully")
+  );
+});
+const getInterviewHistory = asyncHandler(async (req, res) => {
+  const interviews = await InterviewSession.find({
+    user: req.user._id,
+  })
+    .select(
+      "role difficulty status report.overallScore completedAt createdAt"
+    )
+    .sort({ createdAt: -1 });
+
+  return res.status(200).json(
     new ApiResponse(
       200,
-      responsePayload,
-      "Answer submitted successfully"
+      interviews,
+      "Interview history fetched successfully"
     )
   );
 });
+const getDashboard = asyncHandler(async (req, res) => {
 
+  const dashboard = await InterviewSession.aggregate([
+    {
+      $match: {
+        user: req.user._id,
+      },
+    },
+  ]);
+
+});
 module.exports = {
   startInterview,
   submitAnswer,
+  getInterviewHistory,
+  getDashboard,
 };

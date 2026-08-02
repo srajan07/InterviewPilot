@@ -114,7 +114,22 @@ const interviewSessionSchema = new mongoose.Schema(
       default: "",
       trim: true,
     },
-
+report: {
+    overallScore: {
+        type: Number,
+        default: 0,
+    },
+    strengths: [{
+        type: String,
+    }],
+    weaknesses: [{
+        type: String,
+    }],
+    recommendation: {
+        type: String,
+        default: "",
+    },
+},
     startedAt: {
       type: Date,
       default: Date.now,

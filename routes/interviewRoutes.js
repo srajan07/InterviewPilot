@@ -6,5 +6,5 @@ const authMiddleware = require("../middlewares/authMiddleware");
 
 router.post("/start", authMiddleware, startInterview);
 router.post("/submit-answer", authMiddleware, submitAnswer);
-
+router.get("/dashboard",verifyJWT,getDashboard);
 module.exports = router;
