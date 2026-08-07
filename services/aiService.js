@@ -169,7 +169,64 @@ Return exactly one JSON object in this format:
     throw new AppError("Failed to generate interview report", 500);
   }
 };
+const generateInterviewQuestions = async (
+  role,
+  difficulty,
+  language,
+  totalQuestions
+) => {
+   const prompt = `
+You are a senior software engineer.
+
+Generate ${totalQuestions} technical interview questions.
+
+Role:
+${role}
+
+Difficulty:
+${difficulty}
+
+Programming Language:
+${language}
+
+Each question must include:
+
+- question
+- expectedAnswer
+
+Return ONLY valid JSON.
+
+Do not include markdown.
+Do not wrap JSON inside \`\`\`.
+
+Return this format:
+
+[
+  {
+    "question":"...",
+    "expectedAnswer":"..."
+  }
+]
+`;
+const response = await ai.models.generateContent({
+  model: "gemini-2.5-flash",
+  contents: prompt,
+});
+if (!Array.isArray(result)) {
+    throw new AppError("Invalid AI response", 500);
+}
+for (const item of result) {
+  if (
+    !item.question ||
+    !item.expectedAnswer
+  ) {
+    throw new AppError("Invalid AI question format", 500);
+  }
+}
+return result;
+};
 module.exports = {
   evaluateAnswer,
   generateInterviewReport,
+  generateInterviewQuestions,
 };

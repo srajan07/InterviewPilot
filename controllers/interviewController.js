@@ -3,7 +3,13 @@ const asyncHandler = require("../utils/asyncHandler");
 const AppError = require("../utils/AppError");
 const ApiResponse = require("../utils/ApiResponse");
 const dummyQuestions = require("../utils/dummyQuestions");
-const { evaluateAnswer,generateInterviewReport } = require("../services/aiService");
+const mongoose = require("mongoose");
+
+const {
+  evaluateAnswer,
+  generateInterviewReport,
+  generateInterviewQuestions,
+} = require("../services/aiService");
 
 const startInterview = asyncHandler(async (req, res) => {
   const { role, difficulty, language, totalQuestions, duration } = req.body;
@@ -12,7 +18,21 @@ const startInterview = asyncHandler(async (req, res) => {
     throw new AppError("All fields are required", 400);
   }
 
-  const selectedQuestions = dummyQuestions.slice(0, Number(totalQuestions));
+  let selectedQuestions;
+
+  try {
+    selectedQuestions = await generateInterviewQuestions(
+      role,
+      difficulty,
+      language,
+      totalQuestions
+    );
+  } catch (error) {
+    console.error("AI Question Generation Failed:", error.message);
+
+    // Fallback to dummy questions
+    selectedQuestions = dummyQuestions.slice(0, Number(totalQuestions));
+  }
 
   const interviewSession = await InterviewSession.create({
     user: req.user._id,
@@ -70,18 +90,14 @@ const submitAnswer = asyncHandler(async (req, res) => {
     throw new AppError("This question has already been answered", 400);
   }
 
-  // -----------------------------
-  // Save answer immediately
-  // -----------------------------
+  // Save user's answer immediately
   currentQuestion.userAnswer = userAnswer;
   currentQuestion.isAnswered = true;
   currentQuestion.evaluationStatus = "pending";
 
   await interSession.save();
 
-  // -----------------------------
-  // AI Evaluation (must happen BEFORE report generation)
-  // -----------------------------
+  // AI Evaluation
   try {
     const evaluation = await evaluateAnswer(
       currentQuestion.question,
@@ -94,17 +110,18 @@ const submitAnswer = asyncHandler(async (req, res) => {
     currentQuestion.evaluationStatus = "completed";
   } catch (error) {
     console.error("AI Evaluation Failed:", error.message);
-    currentQuestion.score = currentQuestion.score ?? 0;
-    currentQuestion.evaluationStatus = "failed";
-    // Don't throw. User's answer is already stored.
-  }
 
-  await interSession.save();
+    currentQuestion.score = 0;
+    currentQuestion.aiFeedback = "AI evaluation unavailable.";
+    currentQuestion.evaluationStatus = "failed";
+  }
 
   const nextIndex = questionIndex + 1;
   const completed = nextIndex >= interSession.questions.length;
 
-  if (completed) {
+  if (!completed) {
+    interSession.currentQuestion = nextIndex;
+  } else {
     interSession.status = "completed";
     interSession.completedAt = new Date();
 
@@ -112,19 +129,40 @@ const submitAnswer = asyncHandler(async (req, res) => {
       (sum, question) => sum + (question.score || 0),
       0
     );
-    const overallScore = Math.round(totalScore / interSession.questions.length);
 
-    const report = await generateInterviewReport(interSession.questions);
+    const overallScore = Math.round(
+      totalScore / interSession.questions.length
+    );
 
-    interSession.report = {
-      overallScore,
-      strengths: report.strengths,
-      weaknesses: report.weaknesses,
-      recommendation: report.recommendation,
-    };
+    try {
+      const report = await generateInterviewReport(
+        interSession.questions
+      );
 
-    await interSession.save();
+      interSession.report = {
+        overallScore,
+        strengths: report.strengths,
+        weaknesses: report.weaknesses,
+        recommendation: report.recommendation,
+      };
+    } catch (error) {
+      console.error(
+        "Interview Report Generation Failed:",
+        error.message
+      );
+
+      interSession.report = {
+        overallScore,
+        strengths: [],
+        weaknesses: [],
+        recommendation:
+          "Interview report could not be generated.",
+      };
+    }
   }
+
+  // Save everything once
+  await interSession.save();
 
   const responsePayload = {
     sessionId: interSession._id,
@@ -141,7 +179,11 @@ const submitAnswer = asyncHandler(async (req, res) => {
   }
 
   return res.status(200).json(
-    new ApiResponse(200, responsePayload, "Answer submitted successfully")
+    new ApiResponse(
+      200,
+      responsePayload,
+      "Answer submitted successfully"
+    )
   );
 });
 const getInterviewHistory = asyncHandler(async (req, res) => {
@@ -161,17 +203,63 @@ const getInterviewHistory = asyncHandler(async (req, res) => {
     )
   );
 });
-const getDashboard = asyncHandler(async (req, res) => {
 
+const getDashboard = asyncHandler(async (req, res) => {
   const dashboard = await InterviewSession.aggregate([
     {
       $match: {
-        user: req.user._id,
+        user: new mongoose.Types.ObjectId(req.user._id),
+      },
+    },
+    {
+      $group: {
+        _id: null,
+
+        totalInterviews: {
+          $sum: 1,
+        },
+
+        completedInterviews: {
+          $sum: {
+            $cond: [
+              { $eq: ["$status", "completed"] },
+              1,
+              0,
+            ],
+          },
+        },
+
+        averageScore: {
+          $avg: "$report.overallScore",
+        },
+
+        bestScore: {
+          $max: "$report.overallScore",
+        },
       },
     },
   ]);
 
+  const stats = dashboard[0] || {
+    totalInterviews: 0,
+    completedInterviews: 0,
+    averageScore: 0,
+    bestScore: 0,
+  };
+
+  if (stats.averageScore) {
+    stats.averageScore = Math.round(stats.averageScore);
+  }
+
+  return res.status(200).json(
+    new ApiResponse(
+      200,
+      stats,
+      "Dashboard fetched successfully"
+    )
+  );
 });
+
 module.exports = {
   startInterview,
   submitAnswer,
