@@ -6,6 +6,7 @@ const {
   loginUser,
   refreshAccessToken,
   logout,
+  getProfile,
   forgotPassword,
   resetPassword,
 } = require("../controllers/authController");
@@ -18,7 +19,7 @@ router.post("/login", loginUser);
 router.post("/refresh-token", refreshAccessToken);
 router.post("/forgot-password", forgotPassword);
 router.post("/reset-password/:token", resetPassword);
-
+router.get("/me", verifyJWT, getProfile);
 // Protected Route
 router.post("/logout", verifyJWT, logout);
 

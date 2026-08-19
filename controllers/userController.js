@@ -2,7 +2,7 @@ const AppError = require("../utils/AppError");
 const fs = require("fs");
 const asyncHandler = require("../utils/asyncHandler");
 const cloudinary = require("../config/cloudinary");
-const User = require("../models/user");
+const User = require("../models/User");
 const ApiResponse = require("../utils/ApiResponse");
 
 

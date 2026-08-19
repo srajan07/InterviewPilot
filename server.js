@@ -5,12 +5,18 @@ const app=express();
 const authrout=require("./routes/authroutes");
 const errorMiddleware=require("./middleware/errorMiddleware");
 const { connectDB } = require("./config/db");
-const userRoutes = require("./routes/user.routes");
+const userRoutes = require("./routes/userRoutes");
 const resumeRoutes=require("./routes/resumeRoutes");
 const questionRoutes=require("./routes/questionRoutes");
 const authroutes=require("./routes/authroutes");
 const interviewroutes=require("./routes/interviewRoutes");
-
+const cors = require("cors");
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+    credentials: true,
+  })
+);
 app.use(express.json());
 app.use(cookieParser());
 
